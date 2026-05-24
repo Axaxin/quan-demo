@@ -1,0 +1,154 @@
+[
+  {
+    "id": "tshirt-001",
+    "name": "圆领短袖T恤",
+    "category": "tshirt",
+    "price": 99,
+    "colors": [
+      { "name": "白色", "hex": "#f5f5f5" },
+      { "name": "黑色", "hex": "#1a1a1a" },
+      { "name": "蓝灰", "hex": "#6B7D8F" }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+    "description": "100% 纯棉圆领短袖，轻薄透气，日常百搭。"
+  },
+  {
+    "id": "tshirt-002",
+    "name": "V领短袖T恤",
+    "category": "tshirt",
+    "price": 99,
+    "colors": [
+      { "name": "白色", "hex": "#f5f5f5" },
+      { "name": "黑色", "hex": "#1a1a1a" },
+      { "name": "米色", "hex": "#E8DCC8" }
+    ],
+    "sizes": ["S", "M", "L", "XL", "XXL"],
+    "description": "V领修身设计，简约百搭，适合日常通勤。"
+  },
+  {
+    "id": "hoodie-001",
+    "name": "连帽卫衣",
+    "category": "hoodie",
+    "price": 199,
+    "colors": [
+      { "name": "灰色", "hex": "#9CA3AF" },
+      { "name": "黑色", "hex": "#1a1a1a" },
+      { "name": "奶白", "hex": "#F9F6F0" }
+    ],
+    "sizes": ["S", "M", "L", "XL", "XXL"],
+    "description": "宽松版型连帽卫衣，柔软亲肤，秋冬必备。"
+  },
+  {
+    "id": "hoodie-002",
+    "name": "圆领卫衣",
+    "category": "hoodie",
+    "price": 179,
+    "colors": [
+      { "name": "米白", "hex": "#F5F0E8" },
+      { "name": "深蓝", "hex": "#1E3A5F" }
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "description": "极简圆领卫衣，经典版型，多色可选。"
+  },
+  {
+    "id": "shorts-001",
+    "name": "休闲短裤",
+    "category": "shorts",
+    "price": 129,
+    "colors": [
+      { "name": "卡其", "hex": "#C4A882" },
+      { "name": "黑色", "hex": "#1a1a1a" },
+      { "name": "灰色", "hex": "#9CA3AF" }
+    ],
+    "sizes": ["S", "M", "L", "XL", "XXL"],
+    "description": "轻薄速干休闲短裤，弹性腰带，舒适透气。"
+  },
+  {
+    "id": "shorts-002",
+    "name": "运动短裤",
+    "category": "shorts",
+    "price": 99,
+    "colors": [
+      { "name": "黑色", "hex": "#1a1a1a" },
+      { "name": "深灰", "hex": "#4B5563" }
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "description": "弹力运动短裤，适合健身跑步及日常休闲。"
+  },
+  {
+    "id": "pants-001",
+    "name": "直筒休闲裤",
+    "category": "pants",
+    "price": 199,
+    "colors": [
+      { "name": "卡其", "hex": "#C4A882" },
+      { "name": "黑色", "hex": "#1a1a1a" },
+      { "name": "深蓝", "hex": "#1E3A5F" }
+    ],
+    "sizes": ["S", "M", "L", "XL", "XXL"],
+    "description": "直筒版型休闲裤，简约百搭，春秋两季皆宜。"
+  },
+  {
+    "id": "pants-002",
+    "name": "修身西裤",
+    "category": "pants",
+    "price": 229,
+    "colors": [
+      { "name": "黑色", "hex": "#1a1a1a" },
+      { "name": "深灰", "hex": "#374151" }
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "description": "修身剪裁西裤，通勤商务两相宜。"
+  },
+  {
+    "id": "shirt-001",
+    "name": "纯棉牛津衬衣",
+    "category": "shirt",
+    "price": 149,
+    "colors": [
+      { "name": "白色", "hex": "#f5f5f5" },
+      { "name": "淡蓝", "hex": "#BFDBFE" },
+      { "name": "粉色", "hex": "#FBCFE8" }
+    ],
+    "sizes": ["S", "M", "L", "XL", "XXL"],
+    "description": "经典牛津纺衬衣，柔软亲肤，商务休闲均适宜。"
+  },
+  {
+    "id": "shirt-002",
+    "name": "亚麻短袖衬衣",
+    "category": "shirt",
+    "price": 149,
+    "colors": [
+      { "name": "米白", "hex": "#F5F0E8" },
+      { "name": "浅绿", "hex": "#BBF7D0" }
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "description": "天然亚麻短袖衬衣，清爽透气，夏季首选。"
+  },
+  {
+    "id": "polo-001",
+    "name": "经典短袖Polo衫",
+    "category": "polo",
+    "price": 149,
+    "colors": [
+      { "name": "白色", "hex": "#f5f5f5" },
+      { "name": "黑色", "hex": "#1a1a1a" },
+      { "name": "藏蓝", "hex": "#1E3A5F" },
+      { "name": "红色", "hex": "#DC2626" }
+    ],
+    "sizes": ["S", "M", "L", "XL", "XXL"],
+    "description": "经典款Polo衫，修身版型，商务休闲皆宜。"
+  },
+  {
+    "id": "polo-002",
+    "name": "条纹Polo衫",
+    "category": "polo",
+    "price": 159,
+    "colors": [
+      { "name": "白/蓝", "hex": "#BFDBFE" },
+      { "name": "白/红", "hex": "#FECACA" }
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "description": "经典条纹设计，夏季清爽必备。"
+  }
+]
