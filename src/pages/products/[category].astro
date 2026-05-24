@@ -1,0 +1,37 @@
+---
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import products from '../../data/products.json';
+import { CATEGORIES, type CategoryKey } from '../../types/product';
+
+export function getStaticPaths() {
+  return Object.keys(CATEGORIES).map(category => ({ params: { category } }));
+}
+
+const { category } = Astro.params as { category: CategoryKey };
+const label = CATEGORIES[category];
+const categoryProducts = (products as any[]).filter(p => p.category === category);
+---
+
+<Layout title={label}>
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="/">首页</a><span>›</span><span>{label}</span>
+    </nav>
+    <h1 class="page-title">{label}</h1>
+    <p class="product-count">{categoryProducts.length} 件商品</p>
+    <div class="product-grid">
+      {categoryProducts.map(product => <ProductCard product={product} />)}
+    </div>
+  </div>
+</Layout>
+
+<style>
+.breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-400); margin: 24px 0 32px; }
+.breadcrumb a:hover { color: var(--black); }
+.page-title { font-size: 24px; font-weight: 700; letter-spacing: 2px; margin-bottom: 4px; }
+.product-count { font-size: 13px; color: var(--gray-400); margin-bottom: 32px; }
+.product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px 16px; margin-bottom: 80px; }
+</style>
