@@ -1,6 +1,87 @@
 ---
+export const prerender = true;
+
+import Layout from '../layouts/Layout.astro';
+import products from '../data/products.json';
+import { CATEGORIES } from '../types/product';
+
+const featured = products.slice(0, 4);
 ---
-<html lang="zh">
-  <head><meta charset="UTF-8" /><title>QUAN</title></head>
-  <body><h1>QUAN</h1></body>
-</html>
+
+<Layout title="首页">
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-season">2026 SUMMER</p>
+      <h1 class="hero-title">SIMPLE MADE BETTER</h1>
+      <a href="/products/tshirt" class="hero-btn">立即选购</a>
+    </div>
+  </section>
+
+  <section class="container">
+    <h2 class="section-title">品类</h2>
+    <div class="category-grid">
+      {Object.entries(CATEGORIES).map(([key, label]) => (
+        <a href={`/products/${key}`} class="category-card">
+          <div class="category-bg"></div>
+          <span class="category-label">{label}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="container">
+    <h2 class="section-title">本周推荐</h2>
+    <div class="featured-grid">
+      {featured.map(product => (
+        <a href={`/product/${product.id}`} class="featured-card">
+          <div class="featured-img" style={`background: ${product.colors[0].hex}`}></div>
+          <p class="featured-name">{product.name}</p>
+          <p class="featured-price">¥{product.price}</p>
+          <div class="featured-colors">
+            {product.colors.map(c => (
+              <span class="color-dot" style={`background: ${c.hex}; border: 1px solid ${c.hex === '#f5f5f5' || c.hex === '#F5F0E8' || c.hex === '#F9F6F0' ? '#ddd' : c.hex}`}></span>
+            ))}
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>
+
+<style>
+.hero {
+  background: var(--black); color: var(--white);
+  height: 480px; display: flex; align-items: center; justify-content: center; text-align: center;
+}
+.hero-season { font-size: 12px; letter-spacing: 4px; margin-bottom: 16px; opacity: 0.7; }
+.hero-title { font-size: 48px; font-weight: 700; letter-spacing: 6px; margin-bottom: 32px; }
+.hero-btn {
+  display: inline-block; padding: 14px 40px;
+  border: 2px solid var(--white); color: var(--white); font-size: 14px; letter-spacing: 1px;
+  transition: background 0.2s, color 0.2s;
+}
+.hero-btn:hover { background: var(--white); color: var(--black); }
+
+.section-title {
+  font-size: 13px; letter-spacing: 3px; text-transform: uppercase;
+  margin: 60px 0 24px; padding-bottom: 12px; border-bottom: 2px solid var(--black);
+}
+
+.category-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.category-card { position: relative; aspect-ratio: 2/3; overflow: hidden; display: block; }
+.category-bg { width: 100%; height: 100%; background: var(--gray-200); transition: transform 0.3s; }
+.category-card:hover .category-bg { transform: scale(1.04); }
+.category-label {
+  position: absolute; bottom: 12px; left: 0; right: 0;
+  text-align: center; font-size: 13px; font-weight: 600; letter-spacing: 1px;
+}
+
+.featured-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 60px; }
+.featured-card { display: block; }
+.featured-img { aspect-ratio: 3/4; margin-bottom: 12px; transition: opacity 0.2s; }
+.featured-card:hover .featured-img { opacity: 0.85; }
+.featured-name { font-size: 14px; margin-bottom: 4px; }
+.featured-price { font-size: 14px; color: var(--gray-600); margin-bottom: 8px; }
+.featured-colors { display: flex; gap: 6px; }
+.color-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+</style>
