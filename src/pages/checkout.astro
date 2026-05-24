@@ -1,0 +1,131 @@
+---
+export const prerender = true;
+
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="结算">
+  <div class="container">
+    <h1 class="page-title">填写订单</h1>
+
+    <div class="checkout-layout">
+      <div>
+        <h2 class="section-title">收货信息</h2>
+        <form id="checkout-form">
+          <div class="form-group">
+            <label for="name">姓名 *</label>
+            <input type="text" id="name" name="name" required placeholder="请输入收货人姓名" />
+          </div>
+          <div class="form-group">
+            <label for="phone">手机号 *</label>
+            <input type="tel" id="phone" name="phone" required placeholder="请输入11位手机号" pattern="[0-9]{11}" />
+          </div>
+          <div class="form-group">
+            <label for="address">收货地址 *</label>
+            <textarea id="address" name="address" required placeholder="省市区 + 详细地址" rows="3"></textarea>
+          </div>
+
+          <h2 class="section-title" style="margin-top:32px">支付方式</h2>
+          <div class="payment-placeholder">
+            <span>💳</span>
+            <span>货到付款（Demo 占位）</span>
+          </div>
+
+          <button type="submit" id="submit-btn" class="btn-primary" style="margin-top:24px">提交订单</button>
+          <p id="submit-error" class="submit-error"></p>
+        </form>
+      </div>
+
+      <div class="order-summary">
+        <h2 class="summary-title">订单摘要</h2>
+        <div id="summary-items"></div>
+        <div class="summary-divider"></div>
+        <div class="summary-total-row">
+          <span>应付金额</span>
+          <span id="summary-total">¥0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { getCart, getCartTotal, clearCart } from '../stores/cart';
+
+  const cart = getCart();
+  const total = getCartTotal(cart);
+
+  const summaryItems = document.getElementById('summary-items')!;
+  document.getElementById('summary-total')!.textContent = `¥${total}`;
+  summaryItems.innerHTML = cart.map(item => `
+    <div class="summary-item">
+      <div>
+        <p class="summary-item-name">${item.name}</p>
+        <p class="summary-item-meta">${item.color} · ${item.size} × ${item.quantity}</p>
+      </div>
+      <p>¥${item.price * item.quantity}</p>
+    </div>
+  `).join('');
+
+  const form = document.getElementById('checkout-form') as HTMLFormElement;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+  const submitError = document.getElementById('submit-error')!;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (cart.length === 0) {
+      submitError.textContent = '购物车为空，请先添加商品。';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = '提交中...';
+    submitError.textContent = '';
+
+    const data = new FormData(form);
+    try {
+      const res = await fetch('/api/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contact: {
+            name: data.get('name') as string,
+            phone: data.get('phone') as string,
+            address: data.get('address') as string,
+          },
+          items: cart,
+        }),
+      });
+
+      if (!res.ok) throw new Error();
+      const { orderId } = await res.json();
+      clearCart();
+      window.location.href = `/order/${orderId}`;
+    } catch {
+      submitError.textContent = '提交失败，请稍后重试。';
+      submitBtn.disabled = false;
+      submitBtn.textContent = '提交订单';
+    }
+  });
+</script>
+
+<style>
+.page-title { font-size: 24px; font-weight: 700; letter-spacing: 2px; margin: 32px 0; }
+.section-title { font-size: 15px; font-weight: 700; letter-spacing: 1px; margin-bottom: 20px; }
+.checkout-layout { display: grid; grid-template-columns: 1fr 360px; gap: 60px; align-items: start; margin-bottom: 80px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 13px; margin-bottom: 6px; color: var(--gray-600); }
+.form-group input,
+.form-group textarea { width: 100%; padding: 12px; border: 1px solid var(--gray-200); font-family: inherit; font-size: 14px; outline: none; transition: border-color 0.15s; resize: vertical; }
+.form-group input:focus,
+.form-group textarea:focus { border-color: var(--black); }
+.payment-placeholder { display: flex; align-items: center; gap: 12px; padding: 16px; border: 1px solid var(--gray-200); font-size: 14px; }
+.submit-error { font-size: 13px; color: #dc2626; margin-top: 12px; min-height: 20px; }
+.order-summary { border: 1px solid var(--gray-200); padding: 24px; position: sticky; top: 72px; }
+.summary-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; }
+.summary-item { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; font-size: 14px; }
+.summary-item-name { margin-bottom: 2px; }
+.summary-item-meta { font-size: 12px; color: var(--gray-400); }
+.summary-divider { height: 1px; background: var(--gray-200); margin: 16px 0; }
+.summary-total-row { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; }
+</style>
