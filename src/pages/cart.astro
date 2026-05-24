@@ -1,0 +1,117 @@
+---
+export const prerender = true;
+
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="购物车">
+  <div class="container">
+    <h1 class="page-title">购物车</h1>
+
+    <div id="cart-empty" class="cart-empty" hidden>
+      <p>购物车是空的</p>
+      <a href="/" class="btn-secondary" style="display:inline-block;width:auto;padding:12px 32px;margin-top:16px">继续购物</a>
+    </div>
+
+    <div id="cart-content" hidden>
+      <div class="cart-layout">
+        <div id="cart-items"></div>
+        <div class="cart-summary">
+          <h2 class="summary-title">订单摘要</h2>
+          <div class="summary-row"><span>商品合计</span><span id="cart-total">¥0</span></div>
+          <div class="summary-row summary-grand"><span>应付金额</span><span id="cart-grand">¥0</span></div>
+          <a href="/checkout" class="btn-primary" style="margin-top:20px">去结算</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { getCart, removeFromCart, updateQuantity, getCartTotal, getCartCount } from '../stores/cart';
+
+  function render() {
+    const cart = getCart();
+    const emptyEl = document.getElementById('cart-empty')!;
+    const contentEl = document.getElementById('cart-content')!;
+    const itemsEl = document.getElementById('cart-items')!;
+    const totalEl = document.getElementById('cart-total')!;
+    const grandEl = document.getElementById('cart-grand')!;
+    const countEl = document.getElementById('cart-count');
+
+    if (cart.length === 0) {
+      emptyEl.hidden = false;
+      contentEl.hidden = true;
+      if (countEl) countEl.textContent = '0';
+      return;
+    }
+
+    emptyEl.hidden = true;
+    contentEl.hidden = false;
+
+    const total = getCartTotal(cart);
+    totalEl.textContent = `¥${total}`;
+    grandEl.textContent = `¥${total}`;
+    if (countEl) countEl.textContent = String(getCartCount(cart));
+
+    itemsEl.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <div class="item-img" style="background: ${item.colorHex}"></div>
+        <div class="item-details">
+          <p class="item-name">${item.name}</p>
+          <p class="item-meta">${item.color} · ${item.size}</p>
+          <p class="item-price">¥${item.price}</p>
+        </div>
+        <div class="item-actions">
+          <div class="qty-control">
+            <button class="qty-btn" data-action="minus" data-id="${item.productId}" data-color="${item.color}" data-size="${item.size}" data-qty="${item.quantity}">−</button>
+            <span>${item.quantity}</span>
+            <button class="qty-btn" data-action="plus" data-id="${item.productId}" data-color="${item.color}" data-size="${item.size}" data-qty="${item.quantity}">+</button>
+          </div>
+          <button class="remove-btn" data-id="${item.productId}" data-color="${item.color}" data-size="${item.size}">移除</button>
+        </div>
+      </div>
+    `).join('');
+
+    itemsEl.querySelectorAll<HTMLButtonElement>('.qty-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const qty = parseInt(btn.dataset.qty!) + (btn.dataset.action === 'plus' ? 1 : -1);
+        if (qty <= 0) {
+          removeFromCart(btn.dataset.id!, btn.dataset.color!, btn.dataset.size!);
+        } else {
+          updateQuantity(btn.dataset.id!, btn.dataset.color!, btn.dataset.size!, qty);
+        }
+        render();
+      });
+    });
+
+    itemsEl.querySelectorAll<HTMLButtonElement>('.remove-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        removeFromCart(btn.dataset.id!, btn.dataset.color!, btn.dataset.size!);
+        render();
+      });
+    });
+  }
+
+  render();
+</script>
+
+<style>
+.page-title { font-size: 24px; font-weight: 700; letter-spacing: 2px; margin: 32px 0; }
+.cart-empty { text-align: center; padding: 80px 0; color: var(--gray-600); }
+.cart-layout { display: grid; grid-template-columns: 1fr 320px; gap: 40px; align-items: start; margin-bottom: 80px; }
+.cart-item { display: grid; grid-template-columns: 80px 1fr auto; gap: 16px; padding: 20px 0; border-bottom: 1px solid var(--gray-200); align-items: start; }
+.item-img { width: 80px; height: 100px; }
+.item-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.item-meta { font-size: 13px; color: var(--gray-400); margin-bottom: 8px; }
+.item-price { font-size: 14px; }
+.qty-control { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.qty-btn { width: 28px; height: 28px; border: 1px solid var(--gray-200); font-size: 16px; display: flex; align-items: center; justify-content: center; transition: border-color 0.15s; }
+.qty-btn:hover { border-color: var(--black); }
+.remove-btn { font-size: 12px; color: var(--gray-400); text-decoration: underline; }
+.remove-btn:hover { color: var(--black); }
+.cart-summary { border: 1px solid var(--gray-200); padding: 24px; }
+.summary-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; }
+.summary-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--gray-600); margin-bottom: 12px; }
+.summary-grand { font-size: 16px; font-weight: 700; color: var(--black); border-top: 1px solid var(--gray-200); padding-top: 16px; margin-top: 4px; }
+</style>
