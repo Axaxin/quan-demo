@@ -1,0 +1,55 @@
+---
+import { CATEGORIES } from '../types/product';
+---
+
+<nav class="nav">
+  <div class="nav-inner container">
+    <a href="/" class="nav-brand">QUAN</a>
+    <ul class="nav-links">
+      {Object.entries(CATEGORIES).map(([key, label]) => (
+        <li><a href={`/products/${key}`}>{label}</a></li>
+      ))}
+    </ul>
+    <a href="/cart" class="nav-cart">
+      购物车&nbsp;<span id="cart-count" class="cart-badge">0</span>
+    </a>
+  </div>
+</nav>
+
+<script>
+  import { getCart, getCartCount } from '../stores/cart';
+  const el = document.getElementById('cart-count');
+  if (el) el.textContent = String(getCartCount(getCart()));
+</script>
+
+<style>
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--black); color: var(--white);
+}
+.nav-inner {
+  display: flex; align-items: center; height: 56px; gap: 32px;
+}
+.nav-brand {
+  font-size: 20px; font-weight: 700; letter-spacing: 4px;
+  color: var(--white); flex-shrink: 0;
+}
+.nav-links {
+  display: flex; list-style: none; gap: 24px; flex: 1;
+}
+.nav-links a {
+  font-size: 13px; color: rgba(255,255,255,0.75); transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--white); }
+.nav-cart {
+  font-size: 13px; color: rgba(255,255,255,0.75); flex-shrink: 0;
+  display: flex; align-items: center; transition: color 0.2s;
+}
+.nav-cart:hover { color: var(--white); }
+.cart-badge {
+  background: var(--white); color: var(--black);
+  font-size: 11px; font-weight: 700;
+  width: 18px; height: 18px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+</style>
