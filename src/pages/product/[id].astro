@@ -1,0 +1,153 @@
+---
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import products from '../../data/products.json';
+import { CATEGORIES, type CategoryKey, type Product } from '../../types/product';
+
+export function getStaticPaths() {
+  return (products as Product[]).map(product => ({ params: { id: product.id }, props: { product: product as Product } }));
+}
+
+const { product } = Astro.props as { product: Product };
+const label = CATEGORIES[product.category as CategoryKey];
+---
+
+<Layout title={product.name}>
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="/">首页</a><span>›</span>
+      <a href={`/products/${product.category}`}>{label}</a><span>›</span>
+      <span>{product.name}</span>
+    </nav>
+
+    <div id="__product" data-json={JSON.stringify(product)} hidden></div>
+
+    <div class="detail-layout">
+      <div>
+        <div id="main-image" class="main-img" style={`background: ${product.colors[0].hex}`}></div>
+      </div>
+
+      <div class="detail-info">
+        <h1 class="detail-name">{product.name}</h1>
+        <p class="detail-price">¥{product.price}</p>
+        <p class="detail-desc">{product.description}</p>
+
+        <div class="selector-group">
+          <p class="selector-label">颜色：<span id="selected-color">{product.colors[0].name}</span></p>
+          <div class="color-options">
+            {product.colors.map((color, i) => (
+              <button
+                class={`color-btn${i === 0 ? ' selected' : ''}`}
+                data-color={color.name}
+                data-hex={color.hex}
+                style={`background: ${color.hex}`}
+                title={color.name}
+              ></button>
+            ))}
+          </div>
+        </div>
+
+        <div class="selector-group">
+          <p class="selector-label">尺码：<span id="selected-size">请选择</span></p>
+          <div class="size-options">
+            {product.sizes.map(size => (
+              <button class="size-btn" data-size={size}>{size}</button>
+            ))}
+          </div>
+        </div>
+
+        <button id="add-to-cart" class="btn-primary" disabled>加入购物车</button>
+        <p id="add-message" class="add-message"></p>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { addToCart, getCart, getCartCount } from '../../stores/cart';
+
+  const productEl = document.getElementById('__product') as HTMLElement;
+  const product = JSON.parse(productEl.dataset.json!);
+
+  let selectedColor = { name: product.colors[0].name, hex: product.colors[0].hex };
+  let selectedSize: string | null = null;
+
+  const mainImg = document.getElementById('main-image') as HTMLElement;
+  const selectedColorEl = document.getElementById('selected-color') as HTMLElement;
+  const selectedSizeEl = document.getElementById('selected-size') as HTMLElement;
+  const addBtn = document.getElementById('add-to-cart') as HTMLButtonElement;
+  const addMessage = document.getElementById('add-message') as HTMLElement;
+
+  const LIGHT = ['#f5f5f5','#ffffff','#f5f0e8','#f9f6f0','#fbcfe8','#bfdbfe','#bbf7d0','#fecaca','#e8dcc8'];
+
+  function refreshColorBtns() {
+    document.querySelectorAll<HTMLButtonElement>('.color-btn').forEach(btn => {
+      const hex = btn.dataset.hex!;
+      btn.style.border = `1px solid ${LIGHT.includes(hex.toLowerCase()) ? '#ddd' : hex}`;
+      btn.style.outline = btn.dataset.color === selectedColor.name ? '2px solid #1a1a1a' : 'none';
+      btn.style.outlineOffset = '2px';
+    });
+  }
+
+  refreshColorBtns();
+
+  document.querySelectorAll<HTMLButtonElement>('.color-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedColor = { name: btn.dataset.color!, hex: btn.dataset.hex! };
+      selectedColorEl.textContent = selectedColor.name;
+      mainImg.style.background = selectedColor.hex;
+      refreshColorBtns();
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.size-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedSize = btn.dataset.size!;
+      selectedSizeEl.textContent = selectedSize;
+      addBtn.disabled = false;
+    });
+  });
+
+  addBtn.addEventListener('click', () => {
+    addToCart({
+      productId: product.id,
+      name: product.name,
+      color: selectedColor.name,
+      colorHex: selectedColor.hex,
+      size: selectedSize!,
+      quantity: 1,
+      price: product.price,
+    });
+
+    const countEl = document.getElementById('cart-count');
+    if (countEl) countEl.textContent = String(getCartCount(getCart()));
+
+    addMessage.textContent = '✓ 已加入购物车';
+    setTimeout(() => { addMessage.textContent = ''; }, 2000);
+  });
+</script>
+
+<style>
+.breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-400); margin: 24px 0 40px; }
+.breadcrumb a:hover { color: var(--black); }
+.detail-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-bottom: 80px; }
+.main-img { width: 100%; aspect-ratio: 3/4; }
+.detail-name { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+.detail-price { font-size: 22px; margin-bottom: 16px; }
+.detail-desc { font-size: 14px; color: var(--gray-600); line-height: 1.7; margin-bottom: 32px; }
+.selector-group { margin-bottom: 24px; }
+.selector-label { font-size: 13px; margin-bottom: 12px; }
+.color-options { display: flex; gap: 10px; }
+.color-btn { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; transition: transform 0.1s; }
+.color-btn:hover { transform: scale(1.15); }
+.size-options { display: flex; gap: 8px; flex-wrap: wrap; }
+.size-btn { width: 48px; height: 48px; border: 1px solid var(--gray-200); font-size: 13px; transition: border-color 0.15s; }
+.size-btn:hover { border-color: var(--black); }
+.size-btn.selected { border: 2px solid var(--black); font-weight: 600; }
+#add-to-cart:disabled { opacity: 0.4; cursor: not-allowed; }
+#add-to-cart:disabled:hover { background: var(--black); color: var(--white); }
+.add-message { font-size: 13px; color: var(--gray-600); margin-top: 12px; min-height: 20px; }
+</style>
