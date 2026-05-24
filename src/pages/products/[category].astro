@@ -4,7 +4,7 @@ export const prerender = true;
 import Layout from '../../layouts/Layout.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import products from '../../data/products.json';
-import { CATEGORIES, type CategoryKey } from '../../types/product';
+import { CATEGORIES, type CategoryKey, type Product } from '../../types/product';
 
 export function getStaticPaths() {
   return Object.keys(CATEGORIES).map(category => ({ params: { category } }));
@@ -12,7 +12,7 @@ export function getStaticPaths() {
 
 const { category } = Astro.params as { category: CategoryKey };
 const label = CATEGORIES[category];
-const categoryProducts = (products as any[]).filter(p => p.category === category);
+const categoryProducts = (products as Product[]).filter(p => p.category === category);
 ---
 
 <Layout title={label}>
